@@ -8,7 +8,7 @@
 ## Installation
 
 ```
-Install-Package Soenneker.Hangfire.ServiceJobActivator
+dotnet add package Soenneker.Hangfire.ServiceJobActivator
 ```
 
 ## Usage
