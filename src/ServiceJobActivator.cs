@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Soenneker.Hangfire.ServiceJobActivator;
 
-public class ServiceJobActivator : JobActivator
+public sealed class ServiceJobActivator : JobActivator
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
