@@ -10,10 +10,7 @@ public sealed class ServiceJobActivatorScope : JobActivatorScope
 
     public ServiceJobActivatorScope(IServiceScope serviceScope)
     {
-        if (serviceScope == null)
-            throw new ArgumentNullException(nameof(serviceScope));
-
-        _serviceScope = serviceScope;
+        _serviceScope = serviceScope ?? throw new ArgumentNullException(nameof(serviceScope));
     }
 
     public override object Resolve(Type type)
