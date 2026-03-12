@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Soenneker.Hangfire.ServiceJobActivator.csproj" />
+        <ProjectReference Include="..\..\src\Soenneker.Hangfire.ServiceJobActivator\Soenneker.Hangfire.ServiceJobActivator.csproj" />
     </ItemGroup>
 
     <ItemGroup>
