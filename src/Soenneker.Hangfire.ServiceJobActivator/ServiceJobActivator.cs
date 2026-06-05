@@ -16,6 +16,11 @@ public sealed class ServiceJobActivator : JobActivator
         _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
     }
 
+    /// <summary>
+    /// Executes the begin scope operation.
+    /// </summary>
+    /// <param name="context">The context.</param>
+    /// <returns>The result of the operation.</returns>
     public override JobActivatorScope BeginScope(JobActivatorContext context)
     {
         return new ServiceJobActivatorScope(_serviceScopeFactory.CreateScope());
