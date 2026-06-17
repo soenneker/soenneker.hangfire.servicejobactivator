@@ -41,6 +41,5 @@
         <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
         <PackageReference Include="Hangfire.Core" Version="1.8.23" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    </ItemGroup>
+</ItemGroup>
 </Project>
