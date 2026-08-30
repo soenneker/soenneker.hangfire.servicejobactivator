@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Soenneker.Hangfire.ServiceJobActivator;
 
 /// <summary>
-/// Represents the service job activator scope.
+/// Resolves one Hangfire job from an owned dependency-injection scope.
 /// </summary>
 public sealed class ServiceJobActivatorScope : JobActivatorScope
 {
@@ -17,17 +17,17 @@ public sealed class ServiceJobActivatorScope : JobActivatorScope
     }
 
     /// <summary>
-    /// Executes the resolve operation.
+    /// Resolves a required job or dependency from the job scope.
     /// </summary>
     /// <param name="type">The type.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <returns>The resolved service.</returns>
     public override object Resolve(Type type)
     {
-        return _serviceScope.ServiceProvider.GetService(type)!;
+        return _serviceScope.ServiceProvider.GetRequiredService(type);
     }
 
     /// <summary>
-    /// Disposes scope.
+    /// Disposes the dependency-injection scope and its scoped services.
     /// </summary>
     public override void DisposeScope()
     {

@@ -1,39 +1,50 @@
 [![](https://img.shields.io/nuget/v/Soenneker.Hangfire.ServiceJobActivator.svg?style=for-the-badge)](https://www.nuget.org/packages/Soenneker.Hangfire.ServiceJobActivator/)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.hangfire.servicejobactivator/publish-package.yml?style=for-the-badge)](https://github.com/soenneker/soenneker.hangfire.servicejobactivator/actions/workflows/publish-package.yml)
+[![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.hangfire.servicejobactivator/build-and-test.yml?style=for-the-badge&label=build)](https://github.com/soenneker/soenneker.hangfire.servicejobactivator/actions/workflows/build-and-test.yml)
 [![](https://img.shields.io/nuget/dt/Soenneker.Hangfire.ServiceJobActivator.svg?style=for-the-badge)](https://www.nuget.org/packages/Soenneker.Hangfire.ServiceJobActivator/)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.hangfire.servicejobactivator/codeql.yml?label=CodeQL&style=for-the-badge)](https://github.com/soenneker/soenneker.hangfire.servicejobactivator/actions/workflows/codeql.yml)
 
 # Soenneker.Hangfire.ServiceJobActivator
 
-Overrides the default Hangfire activator and resolves services through .NET's default DI provider.
+Creates each Hangfire job through Microsoft dependency injection in its own service scope. Constructor-injected scoped dependencies are reused within one job and disposed when that job activation scope ends.
 
-## Install
+## Installation
 
 ```bash
 dotnet add package Soenneker.Hangfire.ServiceJobActivator
 ```
 
-## Quick start
+## Configure Hangfire
 
 ```csharp
+using Hangfire;
 using Soenneker.Hangfire.ServiceJobActivator.Registrars;
 
-IGlobalConfiguration config = /* obtain from your application */;
-var result = config.AddServiceJobActivator(/* supply services */ default!);
+builder.Services.AddScoped<ImportJob>();
+builder.Services.AddScoped<IImportRepository, ImportRepository>();
+
+builder.Services.AddHangfire((serviceProvider, configuration) =>
+{
+    configuration
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .AddServiceJobActivator(serviceProvider);
+});
 ```
 
-Overrides the default Hangfire activator and resolves services through .NET's default DI provider.
+## Define and enqueue a job
 
-## What you get
+```csharp
+public sealed class ImportJob(IImportRepository repository)
+{
+    public Task Run(Guid importId, CancellationToken cancellationToken) =>
+        repository.RunImport(importId, cancellationToken);
+}
 
-- `ServiceJobActivatorRegistrar` — Overrides the default Hangfire activator and resolves services through .NET's default DI provider.
-- `ServiceJobActivator` — Overrides the default Hangfire activator and resolves services through .NET's default DI provider.
-- `ServiceJobActivatorScope` — Represents the service job activator scope.
+string jobId = BackgroundJob.Enqueue<ImportJob>(job =>
+    job.Run(importId, CancellationToken.None));
+```
 
-## API at a glance
+The activator creates one `IServiceScope` for the job, resolves the job type as a required service, and disposes the scope after execution. The job type and all of its constructor dependencies must therefore be registered. A missing registration fails immediately with `InvalidOperationException` instead of producing a null job instance.
 
-| API | What it does | Result / important behavior |
-| --- | --- | --- |
-| `ServiceJobActivatorRegistrar.AddServiceJobActivator(config, services)` | Overrides the default Hangfire activator and resolves services through .NET's default DI provider. | The resulting global Configuration. |
-| `ServiceJobActivator.BeginScope(context)` | Executes the begin scope operation. | The result of the operation. |
-| `ServiceJobActivatorScope.Resolve(type)` | Executes the resolve operation. | The result of the operation. |
+Keep singleton dependencies free of scoped-service captures. Services that require asynchronous-only disposal are not suitable for this activator because Hangfire's activation scope is disposed synchronously.

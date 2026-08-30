@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Soenneker.Hangfire.ServiceJobActivator;
 
 /// <summary>
-/// Overrides the default Hangfire activator and resolves services through .NET's default DI provider
+/// Creates a dependency-injection scope for each activated Hangfire job.
 /// </summary>
 public sealed class ServiceJobActivator : JobActivator
 {
@@ -17,10 +17,10 @@ public sealed class ServiceJobActivator : JobActivator
     }
 
     /// <summary>
-    /// Executes the begin scope operation.
+    /// Creates the dependency-injection scope used to resolve one Hangfire job.
     /// </summary>
     /// <param name="context">The context.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <returns>An activator scope that owns the created service scope.</returns>
     public override JobActivatorScope BeginScope(JobActivatorContext context)
     {
         return new ServiceJobActivatorScope(_serviceScopeFactory.CreateScope());
