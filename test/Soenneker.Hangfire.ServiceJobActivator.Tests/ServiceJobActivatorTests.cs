@@ -18,7 +18,7 @@ public class ServiceJobActivatorTests : HostedUnitTest
     }
 
     [Test]
-    public async Task Resolve_should_fail_for_an_unregistered_job()
+    public async ValueTask Resolve_should_fail_for_an_unregistered_job()
     {
         using ServiceProvider provider = new ServiceCollection().BuildServiceProvider();
         var scope = new ServiceJobActivatorScope(provider.CreateScope());
