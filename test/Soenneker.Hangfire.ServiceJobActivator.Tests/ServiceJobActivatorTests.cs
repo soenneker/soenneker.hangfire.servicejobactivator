@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Soenneker.Tests.HostedUnit;
+using System.Threading;
 
 namespace Soenneker.Hangfire.ServiceJobActivator.Tests;
 
@@ -18,7 +19,7 @@ public class ServiceJobActivatorTests : HostedUnitTest
     }
 
     [Test]
-    public async ValueTask Resolve_should_fail_for_an_unregistered_job()
+    public async ValueTask Resolve_should_fail_for_an_unregistered_job(CancellationToken cancellationToken)
     {
         using ServiceProvider provider = new ServiceCollection().BuildServiceProvider();
         var scope = new ServiceJobActivatorScope(provider.CreateScope());
